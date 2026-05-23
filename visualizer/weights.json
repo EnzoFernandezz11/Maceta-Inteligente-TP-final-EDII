@@ -1,0 +1,26 @@
+{
+    "normalization": {
+        "mean": {
+            "hum": 165,
+            "temp": 19,
+            "ldr": 166
+        },
+        "scale_mul": {
+            "hum": 4,
+            "temp": 36,
+            "ldr": 4
+        }
+    },
+    "perceptron_riego": {
+        "w_hum": 15,
+        "w_temp": 1,
+        "w_luz": -2,
+        "bias": -2621
+    },
+    "perceptron_sol": {
+        "w_hum": 2,
+        "w_temp": 12,
+        "w_luz": 9,
+        "bias": -1966
+    }
+}
