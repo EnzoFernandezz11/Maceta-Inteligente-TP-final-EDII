@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensory UART Dashboard</title>
-    <meta name="description" content="Dashboard en tiempo real limpio y minimalista para visualizar lecturas de sensores mediante UART desde el PC.">
-    <!-- Google Fonts: Inter for premium typography -->
+    <title>Maceta Inteligente — Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,14 +11,14 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar or Header Panel -->
+
+        <!-- Header -->
         <header class="main-header">
             <div class="logo-area">
                 <span class="logo-dot"></span>
-                <h1>Sensory UART</h1>
+                <h1>Maceta Inteligente</h1>
             </div>
-            
-            <!-- Connection & Recording Panel -->
+
             <section class="control-panel" aria-label="Control de Conexión y Grabación">
                 <div class="status-indicators">
                     <span id="status-badge" class="badge badge-disconnected">Desconectado</span>
@@ -29,7 +27,7 @@
                         Grabando CSV
                     </span>
                 </div>
-                
+
                 <div class="controls-group">
                     <div class="select-wrapper">
                         <label for="port-select" class="sr-only">Puerto COM</label>
@@ -37,15 +35,13 @@
                             <option value="">Cargando puertos...</option>
                         </select>
                     </div>
-                    
+
                     <button id="scan-btn" class="btn btn-icon" title="Escanear puertos disponibles">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                     </button>
-                    
-                    <button id="connect-btn" class="btn btn-primary">
-                        Conectar
-                    </button>
-                    
+
+                    <button id="connect-btn" class="btn btn-primary">Conectar</button>
+
                     <button id="record-btn" class="btn btn-record" disabled title="Iniciar grabación de datos en CSV">
                         Grabar Datos
                     </button>
@@ -53,10 +49,79 @@
             </section>
         </header>
 
-        <!-- Main Dashboard Content -->
+        <!-- Plant Hero Widget -->
+        <section class="plant-hero-card">
+            <div class="plant-visual">
+                <svg id="plant-svg" class="plant-idle" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <clipPath id="plant-clip">
+                            <circle cx="100" cy="100" r="88"/>
+                        </clipPath>
+                    </defs>
+
+                    <!-- Background -->
+                    <circle cx="100" cy="100" r="88" class="p-bg"/>
+
+                    <!-- Soil -->
+                    <ellipse cx="100" cy="183" rx="88" ry="52" class="p-soil" clip-path="url(#plant-clip)"/>
+
+                    <!-- Soil cracks (visible only in dry state) -->
+                    <g clip-path="url(#plant-clip)" class="p-cracks">
+                        <path class="p-crack" d="M 72,150 L 79,160 L 73,170" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path class="p-crack" d="M 113,153 L 121,162 L 115,172" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path class="p-crack" d="M 93,162 L 99,173" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- Trunk -->
+                    <rect x="94" y="130" width="12" height="18" rx="3" class="p-trunk"/>
+
+                    <!-- Tree Tier 3 (bottom, largest) — left = light, right = dark -->
+                    <polygon class="p-light" points="100,90 58,142 100,142"/>
+                    <polygon class="p-dark"  points="100,90 142,142 100,142"/>
+
+                    <!-- Tree Tier 2 (middle) -->
+                    <polygon class="p-light" points="100,66 64,116 100,116"/>
+                    <polygon class="p-dark"  points="100,66 136,116 100,116"/>
+
+                    <!-- Tree Tier 1 (top, smallest) -->
+                    <polygon class="p-light" points="100,44 72,90 100,90"/>
+                    <polygon class="p-dark"  points="100,44 128,90 100,90"/>
+                </svg>
+            </div>
+
+            <div class="plant-info-panel">
+                <h2 class="plant-title">Estado de la Planta</h2>
+
+                <div class="plant-state-row">
+                    <span id="plant-state-badge" class="plant-state-badge badge-state-idle">Sin datos</span>
+                </div>
+
+                <div class="plant-meta">
+                    <div class="plant-meta-item">
+                        <span class="plant-meta-label">Perceptrón</span>
+                        <span id="plant-class-text" class="plant-meta-value">Esperando lecturas...</span>
+                    </div>
+                    <div class="plant-meta-item">
+                        <span class="plant-meta-label">Última lectura</span>
+                        <span id="plant-last-time" class="plant-meta-value plant-time">--:--:--</span>
+                    </div>
+                    <div class="plant-meta-item">
+                        <span class="plant-meta-label">Lecturas totales</span>
+                        <span id="plant-readings-count" class="plant-meta-value">0</span>
+                    </div>
+                </div>
+
+                <div id="plant-alert-msg" class="plant-alert-msg hidden">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span id="plant-alert-text"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sensor Cards Grid -->
         <main class="dashboard-grid">
-            
-            <!-- Sensor Card: Temperature (AN1) -->
+
+            <!-- Temperatura -->
             <article class="sensor-card" id="card-temp">
                 <div class="card-header">
                     <div class="sensor-info">
@@ -78,20 +143,11 @@
                     </div>
                 </div>
                 <div class="card-chart">
-                    <svg id="chart-temp-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="grad-temp" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(239, 68, 68, 0.12)" />
-                                <stop offset="100%" stop-color="rgba(239, 68, 68, 0.0)" />
-                            </linearGradient>
-                        </defs>
-                        <path class="chart-area" fill="url(#grad-temp)" d=""></path>
-                        <path class="chart-line line-temp" d=""></path>
-                    </svg>
+                    <div id="chart-temp" class="echart-container"></div>
                 </div>
             </article>
 
-            <!-- Sensor Card: Humidity (AN2) -->
+            <!-- Humedad -->
             <article class="sensor-card" id="card-hum">
                 <div class="card-header">
                     <div class="sensor-info">
@@ -113,20 +169,11 @@
                     </div>
                 </div>
                 <div class="card-chart">
-                    <svg id="chart-hum-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="grad-hum" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.12)" />
-                                <stop offset="100%" stop-color="rgba(16, 185, 129, 0.0)" />
-                            </linearGradient>
-                        </defs>
-                        <path class="chart-area" fill="url(#grad-hum)" d=""></path>
-                        <path class="chart-line line-hum" d=""></path>
-                    </svg>
+                    <div id="chart-hum" class="echart-container"></div>
                 </div>
             </article>
 
-            <!-- Sensor Card: Light (LDR) (AN0) -->
+            <!-- Luminosidad -->
             <article class="sensor-card" id="card-ldr">
                 <div class="card-header">
                     <div class="sensor-info">
@@ -148,22 +195,13 @@
                     </div>
                 </div>
                 <div class="card-chart">
-                    <svg id="chart-ldr-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="grad-ldr" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(245, 158, 11, 0.12)" />
-                                <stop offset="100%" stop-color="rgba(245, 158, 11, 0.0)" />
-                            </linearGradient>
-                        </defs>
-                        <path class="chart-area" fill="url(#grad-ldr)" d=""></path>
-                        <path class="chart-line line-ldr" d=""></path>
-                    </svg>
+                    <div id="chart-ldr" class="echart-container"></div>
                 </div>
             </article>
 
         </main>
 
-        <!-- Bottom Info & Logs Console -->
+        <!-- Terminal de Eventos -->
         <footer class="app-footer">
             <section class="log-section" aria-label="Consola de logs de sistema">
                 <div class="log-header">
@@ -178,11 +216,13 @@
                 </div>
             </section>
             <div class="footer-credit">
-                <p>Sensory UART Client &bull; Opción B &bull; Diseño Minimalista</p>
+                <p>Maceta Inteligente &bull; PIC16F887 &bull; EDII Dashboard</p>
             </div>
         </footer>
+
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

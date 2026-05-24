@@ -8,11 +8,16 @@ import csv
 import datetime
 import math
 import os
+import functools
+import http.server
 import websockets
 
 # WebSocket server configuration
 WS_HOST = "localhost"
 WS_PORT = 8765
+
+# HTTP static file server configuration
+HTTP_PORT = 8080
 
 # CSV log configuration
 CSV_FILE = "sensor_data.csv"
@@ -128,6 +133,7 @@ def serial_reader_loop(port_name, baud, loop, stop_event):
                             "ldr": ldr_pct,
                             "temp": temp_c,
                             "hum": hum_pct,
+                            "alert": -1,
                             "timestamp": timestamp
                         }), loop
                     )
@@ -141,27 +147,57 @@ def serial_reader_loop(port_name, baud, loop, stop_event):
                 try:
                     line = buf.decode('ascii', errors='ignore').strip()
                     parts = line.split(',')
-                    if len(parts) == 3:
+
+                    raw_ldr = raw_temp = raw_hum = 0
+                    classification = -1
+
+                    # Labeled format: H:820,T:285,L:600,C:1
+                    if ':' in line:
+                        kv = {}
+                        for part in parts:
+                            part = part.strip()
+                            if ':' in part:
+                                k, v = part.split(':', 1)
+                                try:
+                                    kv[k.upper()] = int(v.strip())
+                                except ValueError:
+                                    pass
+                        if all(k in kv for k in ('H', 'T', 'L')):
+                            raw_hum = kv['H']
+                            raw_temp = kv['T']
+                            raw_ldr = kv['L']
+                            classification = kv.get('C', -1)
+                        else:
+                            buf = bytearray()
+                            continue
+                    elif len(parts) >= 3:
+                        # Unlabeled: LDR,TEMP,HUM[,CLASS]
                         raw_ldr = int(parts[0])
                         raw_temp = int(parts[1])
                         raw_hum = int(parts[2])
-                        
-                        ldr_pct = convert_ldr(raw_ldr)
-                        temp_c = convert_temp(raw_temp)
-                        hum_pct = convert_hum(raw_hum)
-                        
-                        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                        log_to_csv(timestamp, ldr_pct, temp_c, hum_pct)
+                        if len(parts) >= 4:
+                            classification = int(parts[3])
+                    else:
+                        buf = bytearray()
+                        continue
 
-                        asyncio.run_coroutine_threadsafe(
-                            data_queue.put({
-                                "type": "data",
-                                "ldr": ldr_pct,
-                                "temp": temp_c,
-                                "hum": hum_pct,
-                                "timestamp": timestamp
-                            }), loop
-                        )
+                    ldr_pct = convert_ldr(raw_ldr)
+                    temp_c = convert_temp(raw_temp)
+                    hum_pct = convert_hum(raw_hum)
+
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    log_to_csv(timestamp, ldr_pct, temp_c, hum_pct)
+
+                    asyncio.run_coroutine_threadsafe(
+                        data_queue.put({
+                            "type": "data",
+                            "ldr": ldr_pct,
+                            "temp": temp_c,
+                            "hum": hum_pct,
+                            "alert": classification,
+                            "timestamp": timestamp
+                        }), loop
+                    )
                 except Exception as e:
                     # Silent ignore if decoding/parsing fails
                     pass
@@ -217,6 +253,15 @@ def simulator_reader_loop(loop, stop_event):
         # Log to CSV (only if is_recording is True inside log_to_csv)
         log_to_csv(timestamp, ldr_pct, temp_c, hum_pct)
 
+        # Cycle through all states every 90s (150 steps * 0.2s = 30s per state)
+        period = int(t / 150) % 3
+        if period == 1:
+            sim_alert = 1   # needs water
+        elif period == 2:
+            sim_alert = 2   # too much sun
+        else:
+            sim_alert = 0   # ok
+
         # Queue for broadcast
         asyncio.run_coroutine_threadsafe(
             data_queue.put({
@@ -224,6 +269,7 @@ def simulator_reader_loop(loop, stop_event):
                 "ldr": ldr_pct,
                 "temp": temp_c,
                 "hum": hum_pct,
+                "alert": sim_alert,
                 "timestamp": timestamp
             }), loop
         )
@@ -366,7 +412,22 @@ async def handler(websocket):
         connected_clients.remove(websocket)
         print(f"Client disconnected. Active clients: {len(connected_clients)}")
 
+def start_http_server():
+    """Serves the visualizer directory as static files on HTTP_PORT."""
+    directory = os.path.dirname(os.path.abspath(__file__))
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=directory)
+    # Suppress request logs to keep terminal clean
+    handler.log_message = lambda *args: None
+    httpd = http.server.HTTPServer(("localhost", HTTP_PORT), handler)
+    print(f"Serving dashboard on http://localhost:{HTTP_PORT}/")
+    httpd.serve_forever()
+
+
 async def main():
+    # Start static HTTP server in a background thread
+    http_thread = threading.Thread(target=start_http_server, daemon=True)
+    http_thread.start()
+
     # Start the data queue broadcaster task
     asyncio.create_task(queue_listener())
 
