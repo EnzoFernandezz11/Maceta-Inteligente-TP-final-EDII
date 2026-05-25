@@ -72,20 +72,20 @@
                         <path class="p-crack" d="M 93,162 L 99,173" stroke-width="1.5" fill="none" stroke-linecap="round"/>
                     </g>
 
-                    <!-- Trunk -->
-                    <rect x="94" y="130" width="12" height="18" rx="3" class="p-trunk"/>
+                    <!-- Outer leaves — hojas exteriores que se abren (p-dark) -->
+                    <g transform="translate(100,145)">
+                        <path d="M 0,0 C -9,-12 -7,-34 0,-58 C 7,-34 9,-12 0,0" class="p-dark" transform="rotate(-58)"/>
+                        <path d="M 0,0 C -9,-12 -7,-34 0,-58 C 7,-34 9,-12 0,0" class="p-dark" transform="rotate(58)"/>
+                        <path d="M 0,0 C -9,-12 -7,-38 0,-65 C 7,-38 9,-12 0,0" class="p-dark" transform="rotate(-33)"/>
+                        <path d="M 0,0 C -9,-12 -7,-38 0,-65 C 7,-38 9,-12 0,0" class="p-dark" transform="rotate(33)"/>
+                    </g>
 
-                    <!-- Tree Tier 3 (bottom, largest) — left = light, right = dark -->
-                    <polygon class="p-light" points="100,90 58,142 100,142"/>
-                    <polygon class="p-dark"  points="100,90 142,142 100,142"/>
-
-                    <!-- Tree Tier 2 (middle) -->
-                    <polygon class="p-light" points="100,66 64,116 100,116"/>
-                    <polygon class="p-dark"  points="100,66 136,116 100,116"/>
-
-                    <!-- Tree Tier 1 (top, smallest) -->
-                    <polygon class="p-light" points="100,44 72,90 100,90"/>
-                    <polygon class="p-dark"  points="100,44 128,90 100,90"/>
+                    <!-- Inner leaves — hojas centrales erectas (p-light) -->
+                    <g transform="translate(100,145)">
+                        <path d="M 0,0 C -7,-12 -5,-44 0,-72 C 5,-44 7,-12 0,0" class="p-light" transform="rotate(-14)"/>
+                        <path d="M 0,0 C -7,-12 -5,-44 0,-72 C 5,-44 7,-12 0,0" class="p-light" transform="rotate(14)"/>
+                        <path d="M 0,0 C -6,-12 -4,-46 0,-78 C 4,-46 6,-12 0,0" class="p-light" transform="rotate(0)"/>
+                    </g>
                 </svg>
             </div>
 
@@ -223,6 +223,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>

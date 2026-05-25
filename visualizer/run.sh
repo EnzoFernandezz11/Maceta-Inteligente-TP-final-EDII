@@ -3,7 +3,7 @@ cd "$(dirname "$0")"
 echo "=============================================="
 echo "Iniciando Servidor UART y WebSocket..."
 echo "=============================================="
-python3 server.py &
+python3 -m backend.server &
 SERVER_PID=$!
 sleep 2
 echo "=============================================="
