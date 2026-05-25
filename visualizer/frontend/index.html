@@ -72,30 +72,20 @@
                         <path class="p-crack" d="M 93,162 L 99,173" stroke-width="1.5" fill="none" stroke-linecap="round"/>
                     </g>
 
-                    <!-- Stem -->
-                    <rect x="96" y="131" width="8" height="16" rx="3" class="p-trunk"/>
-
-                    <!-- Outer rosette leaves (6, every 60°) -->
-                    <g transform="translate(100,113)">
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(0)"/>
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(60)"/>
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(120)"/>
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(180)"/>
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(240)"/>
-                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(300)"/>
+                    <!-- Outer leaves — hojas exteriores que se abren (p-dark) -->
+                    <g transform="translate(100,145)">
+                        <path d="M 0,0 C -9,-12 -7,-34 0,-58 C 7,-34 9,-12 0,0" class="p-dark" transform="rotate(-58)"/>
+                        <path d="M 0,0 C -9,-12 -7,-34 0,-58 C 7,-34 9,-12 0,0" class="p-dark" transform="rotate(58)"/>
+                        <path d="M 0,0 C -9,-12 -7,-38 0,-65 C 7,-38 9,-12 0,0" class="p-dark" transform="rotate(-33)"/>
+                        <path d="M 0,0 C -9,-12 -7,-38 0,-65 C 7,-38 9,-12 0,0" class="p-dark" transform="rotate(33)"/>
                     </g>
 
-                    <!-- Inner rosette leaves (5, offset 30°) -->
-                    <g transform="translate(100,113)">
-                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(30)"/>
-                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(102)"/>
-                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(174)"/>
-                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(246)"/>
-                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(318)"/>
+                    <!-- Inner leaves — hojas centrales erectas (p-light) -->
+                    <g transform="translate(100,145)">
+                        <path d="M 0,0 C -7,-12 -5,-44 0,-72 C 5,-44 7,-12 0,0" class="p-light" transform="rotate(-14)"/>
+                        <path d="M 0,0 C -7,-12 -5,-44 0,-72 C 5,-44 7,-12 0,0" class="p-light" transform="rotate(14)"/>
+                        <path d="M 0,0 C -6,-12 -4,-46 0,-78 C 4,-46 6,-12 0,0" class="p-light" transform="rotate(0)"/>
                     </g>
-
-                    <!-- Center bud -->
-                    <circle cx="100" cy="113" r="6" class="p-light"/>
                 </svg>
             </div>
 
