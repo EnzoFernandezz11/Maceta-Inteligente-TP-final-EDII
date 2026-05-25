@@ -41,8 +41,9 @@ def _pic_classify(hum_pct, temp_c, ldr_pct, weights):
     if z1 >= 0:
         return 1
 
+    # P2 no usa temperatura (igual que el ASM: EVAL_P2 solo opera HUM y LUZ)
     s = weights["perceptron_sol"]
-    z2 = x_h * s["w_hum"] + x_t * s["w_temp"] + x_l * s["w_luz"] + s["bias"]
+    z2 = x_h * s["w_hum"] + x_l * s["w_luz"] + s["bias"]
     return 2 if z2 >= 0 else 0
 
 
@@ -68,12 +69,13 @@ def serial_reader_loop(port_name, baud, loop, stop_event, data_queue):
             val = b[0]
             buf.append(val)
 
-            # --- Formato binario (0xFF header, 7 bytes) ---
+            # --- Formato binario (0xFF header + 6 bytes datos + 1 byte CLASE = 8 bytes) ---
             if buf[0] == 0xFF:
-                if len(buf) >= 7:
+                if len(buf) >= 8:
                     raw_ldr  = (buf[1] << 8) | buf[2]
                     raw_temp = (buf[3] << 8) | buf[4]
                     raw_hum  = (buf[5] << 8) | buf[6]
+                    classification = buf[7]
 
                     ldr_pct = convert_ldr(raw_ldr)
                     temp_c  = convert_temp(raw_temp)
@@ -85,7 +87,7 @@ def serial_reader_loop(port_name, baud, loop, stop_event, data_queue):
                         data_queue.put({
                             "type": "data",
                             "ldr": ldr_pct, "temp": temp_c, "hum": hum_pct,
-                            "alert": -1, "timestamp": timestamp,
+                            "alert": classification, "timestamp": timestamp,
                         }), loop
                     )
                     buf = bytearray()
