@@ -72,20 +72,30 @@
                         <path class="p-crack" d="M 93,162 L 99,173" stroke-width="1.5" fill="none" stroke-linecap="round"/>
                     </g>
 
-                    <!-- Trunk -->
-                    <rect x="94" y="130" width="12" height="18" rx="3" class="p-trunk"/>
+                    <!-- Stem -->
+                    <rect x="96" y="131" width="8" height="16" rx="3" class="p-trunk"/>
 
-                    <!-- Tree Tier 3 (bottom, largest) — left = light, right = dark -->
-                    <polygon class="p-light" points="100,90 58,142 100,142"/>
-                    <polygon class="p-dark"  points="100,90 142,142 100,142"/>
+                    <!-- Outer rosette leaves (6, every 60°) -->
+                    <g transform="translate(100,113)">
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(0)"/>
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(60)"/>
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(120)"/>
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(180)"/>
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(240)"/>
+                        <ellipse cx="0" cy="-20" rx="10" ry="20" class="p-dark" transform="rotate(300)"/>
+                    </g>
 
-                    <!-- Tree Tier 2 (middle) -->
-                    <polygon class="p-light" points="100,66 64,116 100,116"/>
-                    <polygon class="p-dark"  points="100,66 136,116 100,116"/>
+                    <!-- Inner rosette leaves (5, offset 30°) -->
+                    <g transform="translate(100,113)">
+                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(30)"/>
+                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(102)"/>
+                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(174)"/>
+                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(246)"/>
+                        <ellipse cx="0" cy="-13" rx="7" ry="13" class="p-light" transform="rotate(318)"/>
+                    </g>
 
-                    <!-- Tree Tier 1 (top, smallest) -->
-                    <polygon class="p-light" points="100,44 72,90 100,90"/>
-                    <polygon class="p-dark"  points="100,44 128,90 100,90"/>
+                    <!-- Center bud -->
+                    <circle cx="100" cy="113" r="6" class="p-light"/>
                 </svg>
             </div>
 

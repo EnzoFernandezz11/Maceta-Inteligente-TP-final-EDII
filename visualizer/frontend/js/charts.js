@@ -12,7 +12,7 @@ export function initCharts() {
     chartHum  = echarts.init(document.getElementById('chart-hum'),  null, { renderer: 'canvas' });
     chartLdr  = echarts.init(document.getElementById('chart-ldr'),  null, { renderer: 'canvas' });
 
-    chartTemp.setOption(_makeOption('#d9383a', 15, 35));
+    chartTemp.setOption(_makeOption('#d9383a', 0, 100));
     chartHum.setOption(_makeOption('#107c41',   0, 100));
     chartLdr.setOption(_makeOption('#b7791f',   0, 100));
 
