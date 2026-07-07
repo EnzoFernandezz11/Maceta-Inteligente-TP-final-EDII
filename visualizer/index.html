@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensory UART Dashboard</title>
+    <meta name="description" content="Dashboard en tiempo real limpio y minimalista para visualizar lecturas de sensores mediante UART desde el PC.">
+    <!-- Google Fonts: Inter for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar or Header Panel -->
+        <header class="main-header">
+            <div class="logo-area">
+                <span class="logo-dot"></span>
+                <h1>Sensory UART</h1>
+            </div>
+            
+            <!-- Connection & Recording Panel -->
+            <section class="control-panel" aria-label="Control de Conexión y Grabación">
+                <div class="status-indicators">
+                    <span id="status-badge" class="badge badge-disconnected">Desconectado</span>
+                    <span id="recording-badge" class="badge badge-recording hidden">
+                        <span class="pulse-dot"></span>
+                        Grabando CSV
+                    </span>
+                </div>
+                
+                <div class="controls-group">
+                    <div class="select-wrapper">
+                        <label for="port-select" class="sr-only">Puerto COM</label>
+                        <select id="port-select" title="Seleccione el puerto serial">
+                            <option value="">Cargando puertos...</option>
+                        </select>
+                    </div>
+                    
+                    <button id="scan-btn" class="btn btn-icon" title="Escanear puertos disponibles">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    </button>
+                    
+                    <button id="connect-btn" class="btn btn-primary">
+                        Conectar
+                    </button>
+                    
+                    <button id="record-btn" class="btn btn-record" disabled title="Iniciar grabación de datos en CSV">
+                        Grabar Datos
+                    </button>
+                </div>
+            </section>
+        </header>
+
+        <!-- Banner de Inferencia del Perceptrón (PIC) -->
+        <section class="perceptron-banner" id="plant-status-banner">
+            <div class="banner-content">
+                <span class="status-indicator-dot" id="plant-status-dot"></span>
+                <span class="status-text-label">Estado de la Planta (Chip):</span>
+                <span class="status-text" id="plant-status-text">Esperando telemetría...</span>
+            </div>
+            <span class="banner-badge">Perceptrón PIC16F887</span>
+        </section>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-grid">
+            
+            <!-- Sensor Card: Temperature (AN1) -->
+            <article class="sensor-card" id="card-temp">
+                <div class="card-header">
+                    <div class="sensor-info">
+                        <span class="sensor-icon icon-temp">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                        </span>
+                        <h2>Temperatura</h2>
+                    </div>
+                    <span class="channel-badge">AN1</span>
+                </div>
+                <div class="card-body">
+                    <div class="value-display">
+                        <span id="temp-val" class="main-value">--.-</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="card-meta">
+                        <span class="status-indicator-label">Estado:</span>
+                        <span class="status-indicator text-stable" id="temp-indicator">Esperando...</span>
+                    </div>
+                </div>
+                <div class="card-chart">
+                    <svg id="chart-temp-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="grad-temp" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(239, 68, 68, 0.12)" />
+                                <stop offset="100%" stop-color="rgba(239, 68, 68, 0.0)" />
+                            </linearGradient>
+                        </defs>
+                        <path class="chart-area" fill="url(#grad-temp)" d=""></path>
+                        <path class="chart-line line-temp" d=""></path>
+                    </svg>
+                </div>
+            </article>
+
+            <!-- Sensor Card: Humidity (AN2) -->
+            <article class="sensor-card" id="card-hum">
+                <div class="card-header">
+                    <div class="sensor-info">
+                        <span class="sensor-icon icon-hum">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                        </span>
+                        <h2>Humedad</h2>
+                    </div>
+                    <span class="channel-badge">AN2</span>
+                </div>
+                <div class="card-body">
+                    <div class="value-display">
+                        <span id="hum-val" class="main-value">--.-</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="card-meta">
+                        <span class="status-indicator-label">Estado:</span>
+                        <span class="status-indicator text-stable" id="hum-indicator">Esperando...</span>
+                    </div>
+                </div>
+                <div class="card-chart">
+                    <svg id="chart-hum-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="grad-hum" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.12)" />
+                                <stop offset="100%" stop-color="rgba(16, 185, 129, 0.0)" />
+                            </linearGradient>
+                        </defs>
+                        <path class="chart-area" fill="url(#grad-hum)" d=""></path>
+                        <path class="chart-line line-hum" d=""></path>
+                    </svg>
+                </div>
+            </article>
+
+            <!-- Sensor Card: Light (LDR) (AN0) -->
+            <article class="sensor-card" id="card-ldr">
+                <div class="card-header">
+                    <div class="sensor-info">
+                        <span class="sensor-icon icon-ldr">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        </span>
+                        <h2>Luminosidad</h2>
+                    </div>
+                    <span class="channel-badge">AN0</span>
+                </div>
+                <div class="card-body">
+                    <div class="value-display">
+                        <span id="ldr-val" class="main-value">--.-</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="card-meta">
+                        <span class="status-indicator-label">Estado:</span>
+                        <span class="status-indicator text-stable" id="ldr-indicator">Esperando...</span>
+                    </div>
+                </div>
+                <div class="card-chart">
+                    <svg id="chart-ldr-svg" class="realtime-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="grad-ldr" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(245, 158, 11, 0.12)" />
+                                <stop offset="100%" stop-color="rgba(245, 158, 11, 0.0)" />
+                            </linearGradient>
+                        </defs>
+                        <path class="chart-area" fill="url(#grad-ldr)" d=""></path>
+                        <path class="chart-line line-ldr" d=""></path>
+                    </svg>
+                </div>
+            </article>
+
+        </main>
+
+        <!-- Bottom Info & Logs Console -->
+        <footer class="app-footer">
+            <section class="log-section" aria-label="Consola de logs de sistema">
+                <div class="log-header">
+                    <h3>Terminal de Eventos</h3>
+                    <div class="log-actions">
+                        <button id="clear-log-btn" class="btn-text">Limpiar Consola</button>
+                    </div>
+                </div>
+                <div id="log-terminal" class="log-terminal">
+                    <div class="log-line system">[INFO] Inicializando panel de control UART...</div>
+                    <div class="log-line system">[INFO] Esperando conexión con servidor WebSocket...</div>
+                </div>
+            </section>
+            <div class="footer-credit">
+                <p>Sensory UART Client &bull; Opción B &bull; Diseño Minimalista</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
