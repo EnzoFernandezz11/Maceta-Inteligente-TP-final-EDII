@@ -327,14 +327,9 @@ python train.py
 
 ---
 
-## 👥 Autores
 
 Trabajo Práctico Final — **Electrónica Digital II**
 
----
 
-<div align="center">
 
-*Hecho con 🌱 y mucho Assembly*
 
-</div>
